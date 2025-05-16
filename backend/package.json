@@ -1,0 +1,25 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "A full backend playgrounf",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node src/index.js"
+  },
+  "keywords": [
+    "backend",
+    "nodejs",
+    "mongodb"
+  ],
+  "author": "Salman",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  },
+  "dependencies": {
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "mongoose": "^8.14.3"
+  }
+}
