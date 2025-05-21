@@ -24,6 +24,6 @@ router.post(
 
 router.post("/login", loginUser);
 router.post("/logout", verifyJwt, logoutUser);
-router.post("refreshAccessToken", refreshAccessToken);
+router.post("/refreshToken", verifyJwt, refreshAccessToken);
 
 export default router;
