@@ -26,8 +26,10 @@ app.use(cookieParser());
 
 import userRouter from "./routes/user.routes.js";
 import { errorHandler } from "./middlewares/errorHandler.middleware.js";
+import tweetRouter from "./routes/tweet.routes.js";
 
 app.use("/api/v1/user", userRouter);
+app.use("/api/v1/tweet", tweetRouter);
 app.use(errorHandler);
 
 export { app };

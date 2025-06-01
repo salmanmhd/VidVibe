@@ -4,7 +4,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { User } from "../models/user.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import jwt from "jsonwebtoken";
-import { verifyJwt } from "../middlewares/auth.middleware.js";
+import { verifyJWT } from "../middlewares/auth.middleware.js";
 import mongoose, { mongo } from "mongoose";
 
 async function generateRefreshAndAccessToken(user) {
