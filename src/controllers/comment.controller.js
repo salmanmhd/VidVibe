@@ -1,8 +1,8 @@
 import mongoose, { isValidObjectId } from "mongoose";
 import { Comment } from "../models/comment.model.js";
-import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { validateInput } from "../utils/validateInputs.js";
 
 const getVideoComments = asyncHandler(async (req, res) => {
   const { videoId } = req.params;
@@ -20,7 +20,7 @@ const getVideoComments = asyncHandler(async (req, res) => {
     const aggregateQuery = Comment.aggregate([
       {
         $match: {
-          comment: videoId,
+          video: new mongoose.Types.ObjectId(videoId),
         },
       },
     ]);
@@ -63,7 +63,7 @@ const addComment = asyncHandler(async (req, res) => {
 
   const requiredFields = { videoId, content, userId };
 
-  const missingFields = getMissingFields(requiredFields);
+  const missingFields = validateInput(requiredFields);
 
   if (missingFields.length > 0) {
     return res.status(400).json(
@@ -111,7 +111,7 @@ const updateComment = asyncHandler(async (req, res) => {
     content,
   };
 
-  const missingFields = getMissingFields(requiredFields);
+  const missingFields = validateInput(requiredFields);
 
   if (missingFields.length > 0) {
     return res.status(400).json(
@@ -122,23 +122,31 @@ const updateComment = asyncHandler(async (req, res) => {
   }
 
   try {
-    const updatedComment = await Comment.findByIdAndUpdate(commentId, {
-      content,
-    });
+    const comment = await Comment.findById(commentId);
 
-    if (!updatedComment) {
-      return res.status(500).json(
-        new ApiResponse(500, "Something went wrong while updating comments", {
-          error: `unable to communicate with db`,
+    if (!comment) {
+      return res.status(404).json(
+        new ApiResponse(404, null, {
+          error: "Comment not found",
         })
       );
     }
 
-    res
-      .status(200)
-      .json(
-        new ApiResponse(200, "Comment updated successfully", updatedComment)
+    if (!comment.owner.equals(req.user._id)) {
+      return res.status(403).json(
+        new ApiResponse(403, "Unable to update comment", {
+          error: `you are not authorized to update this comment`,
+        })
       );
+    }
+
+    comment.content = content;
+
+    await comment.save();
+
+    res.status(200).json(
+      new ApiResponse(200, "Comment updated successfully") // updatedComment)
+    );
   } catch (error) {
     res.status(500).json(
       new ApiResponse(500, `Something went wrong while updating comments`, {
@@ -150,37 +158,38 @@ const updateComment = asyncHandler(async (req, res) => {
 
 const deleteComment = asyncHandler(async (req, res) => {
   const { commentId } = req.params;
+
   if (!commentId || !isValidObjectId(commentId)) {
     return res.status(400).json(
-      new ApiResponse(400, `please provide valid commentId`, {
-        error: "commentId missing or malformed",
+      new ApiResponse(400, null, {
+        error: "commentId is missing or malformed",
       })
     );
   }
 
-  try {
-    const deletedComment = await Comment.findByIdAndDelete(commentId);
+  const comment = await Comment.findById(commentId);
 
-    if (!deletedComment) {
-      return res.status(500).json(
-        new ApiResponse(500, "Something went wrong while deleting comments", {
-          error: `unable to communicate with db`,
-        })
-      );
-    }
-
-    res
-      .status(200)
-      .json(
-        new ApiResponse(200, "Comment deleted successfully", deletedComment)
-      );
-  } catch (error) {
-    res.status(500).json(
-      new ApiResponse(500, `Something went wrong while deleting comments`, {
-        error: error.message,
+  if (!comment) {
+    return res.status(404).json(
+      new ApiResponse(404, null, {
+        error: "Comment not found",
       })
     );
   }
+
+  if (!comment.owner.equals(req.user._id)) {
+    return res.status(403).json(
+      new ApiResponse(403, null, {
+        error: "You are not authorized to delete this comment",
+      })
+    );
+  }
+
+  await comment.deleteOne();
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, null, "Comment deleted successfully"));
 });
 
 export { getVideoComments, addComment, updateComment, deleteComment };
