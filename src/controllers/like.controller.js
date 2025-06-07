@@ -63,7 +63,10 @@ const toggleCommentLike = asyncHandler(async (req, res) => {
   }
 
   try {
-    const like = await Like.findOne({ comment: commentId });
+    const like = await Like.findOne({
+      comment: commentId,
+      likedBy: req.user?._id,
+    });
 
     if (!like) {
       const createdLike = await Like.create({
@@ -118,7 +121,7 @@ const toggleTweetLike = asyncHandler(async (req, res) => {
   }
 
   try {
-    const like = await Like.findOne({ tweet: tweetId });
+    const like = await Like.findOne({ tweet: tweetId, likedBy: req.user?._id });
 
     if (!like) {
       const createdLike = await Like.create({
