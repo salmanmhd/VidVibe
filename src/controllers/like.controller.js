@@ -14,7 +14,7 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
   }
 
   try {
-    const like = await Like.findOne({ video: videoId });
+    const like = await Like.findOne({ video: videoId, likedBy: req.user?._id });
 
     if (!like) {
       const createdLike = await Like.create({

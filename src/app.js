@@ -43,7 +43,7 @@ app.use("/api/v1/comment", commentRouter);
 app.use("/api/v1/s", subscriptionRouter);
 app.use("/api/v1/l", likeRouter);
 app.use("/api/v1/playlist", playlistRouter);
-// app.use("/api/v1/dashboard", dashboardRouter);
-// app.use("/api/v1/healthcheck", healthcheckRouter);
+app.use("/api/v1/dashboard", dashboardRouter);
+app.use("/api/v1/healthcheck", healthcheckRouter);
 
 export { app };
