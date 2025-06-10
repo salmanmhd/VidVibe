@@ -1,4 +1,12 @@
+import { useNavigate } from "react-router-dom";
+
 function Signup() {
+  const navigate = useNavigate();
+
+  function handlerClick() {
+    navigate("/login");
+  }
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 px-4">
       <form className="w-full max-w-md space-y-6 rounded-2xl border border-white/10 bg-white/5 p-8 shadow-2xl backdrop-blur-md">
@@ -59,6 +67,13 @@ function Signup() {
             className="w-full text-white file:cursor-pointer file:rounded-lg file:border-0 file:bg-purple-600 file:px-4 file:py-2 file:text-white"
           />
         </div>
+
+        <p className="text-center text-sm text-white">
+          Already registered?
+          <span onClick={handlerClick} className="cursor-pointer underline">
+            Login
+          </span>
+        </p>
 
         <button
           type="submit"
